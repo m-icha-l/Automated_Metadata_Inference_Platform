@@ -37,6 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Spatial & API Extensions
+    'django.contrib.gis',
+    'rest_framework',
+    'drf_spectacular',
+    
+    # Your App
+    'metadata_api',
 ]
 
 MIDDLEWARE = [
@@ -74,8 +82,12 @@ WSGI_APPLICATION = 'diwa_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'metadata_db',
+        'USER': 'diwa_user',
+        'PASSWORD': 'supersecretpassword',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
