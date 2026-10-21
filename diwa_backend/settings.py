@@ -86,7 +86,7 @@ DATABASES = {
         'NAME': 'metadata_db',
         'USER': 'diwa_user',
         'PASSWORD': 'supersecretpassword',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
