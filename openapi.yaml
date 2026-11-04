@@ -1,0 +1,503 @@
+openapi: 3.0.3
+info:
+  title: DIWA Metadata API
+  version: 1.0.0
+paths:
+  /api/v1/infer/:
+    post:
+      operationId: infer_create
+      description: 'POST /api/v1/infer/ : upload a file, get a draft record and gap
+        report.'
+      tags:
+      - infer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InferInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InferInput'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InferResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '413':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '501':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/v1/records/:
+    get:
+      operationId: records_list
+      description: 'GET /api/v1/records/ : approved records only, paginated.'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - records
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRecordList'
+          description: ''
+  /api/v1/records/{record_id}/:
+    get:
+      operationId: records_retrieve
+      description: GET /api/v1/records/<uuid>/
+      parameters:
+      - in: path
+        name: record_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - records
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Record'
+          description: ''
+  /api/v1/submit/:
+    post:
+      operationId: submit_create
+      description: 'POST /api/v1/submit/ : same gate as /validate/, then identifier
+        + storage.'
+      tags:
+      - submit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmitInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmitInput'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitResponse'
+          description: ''
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateResponse'
+          description: ''
+        '501':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/v1/validate/:
+    post:
+      operationId: validate_create
+      description: |-
+        POST /api/v1/validate/ : gap detection + ISO 19139 schema validation.
+        Always 200; the result is in `is_valid`, so the form can render it.
+      tags:
+      - validate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ValidateInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ValidateInput'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateResponse'
+          description: ''
+        '501':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+components:
+  schemas:
+    BlankEnum:
+      enum:
+      - ''
+    Distribution:
+      type: object
+      properties:
+        identifier:
+          type: string
+        access_url:
+          type: string
+          format: uri
+      required:
+      - access_url
+      - identifier
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+      - error
+    GapReport:
+      type: object
+      properties:
+        missing_fields:
+          type: array
+          items:
+            type: string
+          description: Dotted paths, e.g. temporal_extent.start
+        is_complete:
+          type: boolean
+      required:
+      - is_complete
+      - missing_fields
+    InferInput:
+      type: object
+      properties:
+        file:
+          type: string
+          format: uri
+      required:
+      - file
+    InferResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        draft_record:
+          $ref: '#/components/schemas/MetadataContent'
+        gap_report:
+          $ref: '#/components/schemas/GapReport'
+      required:
+      - draft_record
+      - gap_report
+      - message
+    Keyword:
+      type: object
+      properties:
+        keyword:
+          type: string
+        thesaurus:
+          type: string
+          default: GEMET
+        uri:
+          oneOf:
+          - type: string
+            format: uri
+          - type: string
+            maxLength: 0
+      required:
+      - keyword
+    MetadataContent:
+      type: object
+      description: |-
+        The metadata record itself. Every field is optional here: completeness
+        is enforced by gap detection (services.find_gaps), not by the serializer,
+        so drafts can be round-tripped through the form.
+      properties:
+        title:
+          type: string
+        abstract:
+          type: string
+        contact_email:
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+        topic_category:
+          oneOf:
+          - $ref: '#/components/schemas/TopicCategoryEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        keywords:
+          type: array
+          items:
+            $ref: '#/components/schemas/Keyword'
+        lineage:
+          type: string
+        crs:
+          type: string
+          nullable: true
+        bounding_box_bbox:
+          type: array
+          items:
+            type: number
+            format: double
+          nullable: true
+          description: '[west, south, east, north] in WGS84 lon/lat'
+          maxItems: 4
+          minItems: 4
+        temporal_extent:
+          $ref: '#/components/schemas/TemporalExtent'
+        statistics:
+          $ref: '#/components/schemas/Statistics'
+        distribution:
+          allOf:
+          - $ref: '#/components/schemas/Distribution'
+          readOnly: true
+          description: Assigned by the server on submission
+        provenance:
+          type: object
+          additionalProperties:
+            enum:
+            - inferred
+            - user
+            type: string
+            description: |-
+              * `inferred` - inferred
+              * `user` - user
+          description: 'Per-field origin: ''inferred'' or ''user'''
+      required:
+      - distribution
+    PaginatedRecordList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Record'
+    Record:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        current_version:
+          type: integer
+          readOnly: true
+        record:
+          allOf:
+          - $ref: '#/components/schemas/MetadataContent'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - current_version
+      - id
+      - record
+      - status
+      - updated_at
+    Statistics:
+      type: object
+      properties:
+        min:
+          type: number
+          format: double
+          nullable: true
+        max:
+          type: number
+          format: double
+          nullable: true
+        mean:
+          type: number
+          format: double
+          nullable: true
+        nodata:
+          type: number
+          format: double
+          nullable: true
+    SubmitInput:
+      type: object
+      properties:
+        record:
+          $ref: '#/components/schemas/MetadataContent'
+        qaqc_confirmed:
+          type: boolean
+          default: false
+      required:
+      - record
+    SubmitResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        record_id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+        identifier:
+          type: string
+        access_url:
+          type: string
+          format: uri
+      required:
+      - access_url
+      - identifier
+      - message
+      - record_id
+      - version
+    TemporalExtent:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date-time
+          nullable: true
+        end:
+          type: string
+          format: date-time
+          nullable: true
+        timezone:
+          type: string
+          description: IANA zone, e.g. Europe/Helsinki
+    TopicCategoryEnum:
+      enum:
+      - farming
+      - biota
+      - boundaries
+      - climatologyMeteorologyAtmosphere
+      - economy
+      - elevation
+      - environment
+      - geoscientificInformation
+      - health
+      - imageryBaseMapsEarthCover
+      - intelligenceMilitary
+      - inlandWaters
+      - location
+      - oceans
+      - planningCadastre
+      - society
+      - structure
+      - transportation
+      - utilitiesCommunication
+      type: string
+      description: |-
+        * `farming` - farming
+        * `biota` - biota
+        * `boundaries` - boundaries
+        * `climatologyMeteorologyAtmosphere` - climatologyMeteorologyAtmosphere
+        * `economy` - economy
+        * `elevation` - elevation
+        * `environment` - environment
+        * `geoscientificInformation` - geoscientificInformation
+        * `health` - health
+        * `imageryBaseMapsEarthCover` - imageryBaseMapsEarthCover
+        * `intelligenceMilitary` - intelligenceMilitary
+        * `inlandWaters` - inlandWaters
+        * `location` - location
+        * `oceans` - oceans
+        * `planningCadastre` - planningCadastre
+        * `society` - society
+        * `structure` - structure
+        * `transportation` - transportation
+        * `utilitiesCommunication` - utilitiesCommunication
+    ValidateInput:
+      type: object
+      properties:
+        record:
+          $ref: '#/components/schemas/MetadataContent'
+      required:
+      - record
+    ValidateResponse:
+      type: object
+      properties:
+        is_valid:
+          type: boolean
+        gap_report:
+          $ref: '#/components/schemas/GapReport'
+        schema_errors:
+          type: array
+          items:
+            type: string
+      required:
+      - gap_report
+      - is_valid
+      - schema_errors
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
