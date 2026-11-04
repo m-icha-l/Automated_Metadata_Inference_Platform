@@ -1,0 +1,50 @@
+#pygeometa metadata generate sample.yml --schema=iso19139 --output=sample.xml
+mcf:
+    version: 2.0
+
+metadata:
+    identifier: ""
+    language: ""
+    hierarchylevel: ""
+    dates:
+        creation: "2026-11-04"
+    dataseturi: ""
+    additional_identifiers: []
+
+spatial:
+    datatype: ""
+    denominators: []
+    resolution: []
+
+identification:
+    title: ""
+    abstract: ""
+    dates: {}
+    keywords: {}
+    browsegraphic: null
+    topiccategory: []
+    extents:
+        spatial:
+            - bbox: []
+        temporal:
+            - begin: null
+              end: null
+    accessconstraints: ""
+    status: ""
+
+contact:
+    pointOfContact:
+        name: ""
+        organization: ""
+        position: ""
+        phone: ""
+        fax: ""
+        address: ""
+        city: ""
+        region: ""
+        postcode: ""
+        country: ""
+        email: ""
+        url: ""
+
+distribution: {}
