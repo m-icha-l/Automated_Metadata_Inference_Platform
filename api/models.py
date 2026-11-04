@@ -62,6 +62,8 @@ class RecordVersion(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True,
                                    on_delete=models.SET_NULL, related_name="+")
     created_at = models.DateTimeField(auto_now_add=True)
+
+    provenance = models.JSONField(default=dict)
  
     class Meta:
         ordering = ["record", "-version_number"]
@@ -88,7 +90,9 @@ class ProvenanceTag(models.Model):
     detail = models.CharField(max_length=500, blank=True,
                               help_text="Optional, e.g. which file or method it was inferred from")
     created_at = models.DateTimeField(auto_now_add=True)
- 
+
+    
+
     class Meta:
         ordering = ["version", "field_name"]
         constraints = [

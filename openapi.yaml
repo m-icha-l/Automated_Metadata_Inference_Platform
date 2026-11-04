@@ -99,6 +99,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/Record'
           description: ''
+    put:
+      operationId: records_update
+      description: PUT /api/v1/records/<uuid>/ - Update record and create a new version.
+      parameters:
+      - in: path
+        name: record_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - records
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitInput'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Record'
+          description: 'Record successfully updated'
   /api/v1/submit/:
     post:
       operationId: submit_create

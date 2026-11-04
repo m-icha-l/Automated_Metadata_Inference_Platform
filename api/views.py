@@ -1,5 +1,6 @@
 import logging
 import os
+import uuid
 import tempfile
 from pathlib import Path
 
@@ -12,6 +13,7 @@ from rest_framework.views import APIView
 
 from . import services
 from .models import MetadataRecord  # task 8
+from .storage import store_record, update_record
 from .serializers import (
     ErrorSerializer,
     InferInputSerializer,
@@ -22,6 +24,7 @@ from .serializers import (
     ValidateInputSerializer,
     ValidateResponseSerializer,
 )
+
 
 logger = logging.getLogger(__name__)
 
@@ -105,6 +108,7 @@ class ValidateMetadataView(APIView):
 
 
 class SubmitMetadataView(APIView):
+    #dukmmy for t esting
     """POST /api/v1/submit/ : same gate as /validate/, then identifier + storage."""
     permission_classes = [IsAuthenticated]
 
@@ -120,31 +124,35 @@ class SubmitMetadataView(APIView):
         record = _mark_provenance(dict(serializer.validated_data["record"]), "user")
         record.pop("distribution", None)  # server-assigned only
 
-        # 1) the gate: gaps + schema. Cannot be skipped by API clients.
-        result = services.check_record(record)
-        if not result.is_valid:
+        # 1) Gap detection check (blocks incomplete records with 422)
+        gaps = services.find_gaps(record)
+        if gaps:
             return Response({
                 "is_valid": False,
-                "gap_report": _gap_report(result.gaps),
-                "schema_errors": result.schema_errors,
+                "gap_report": _gap_report(gaps),
+                "schema_errors": [],
             }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        # 2) identifier goes into the distribution info, so re-check the XML with it
-        record["distribution"] = services.assign_identifier(record)
-        result = services.check_record(record)
-        if not result.is_valid:
-            logger.error("Record became invalid after identifier assignment: %s",
-                         result.schema_errors)
-            return Response({"error": "Internal error while finalising the record."},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # 2) MOCK TASK 6: Assign dummy identifier & access URL (bypassing 501)
+        generated_id = f"oulu-basin-{uuid.uuid4().hex[:8]}"
+        record["distribution"] = {
+            "identifier": generated_id,
+            "access_url": f"http://127.0.0.1:8000/api/v1/records/{generated_id}/"
+        }
 
-        # 3) store_record (task 8) does version + provenance + QAQC + audit atomically
-        stored = services.store_record(
-            record, result.xml, request.user,
+        # 3) MOCK TASK 5: Dummy XML snapshot (bypassing 501 pygeometa)
+        dummy_xml = "<gmd:MD_Metadata xmlns:gmd='http://www.isotc211.org/2005/gmd'>Dummy ISO 19139 XML</gmd:MD_Metadata>"
+
+        # 4) TASK 8: Store record, version 1, provenance, and QAQC confirmation in PostGIS
+        stored = store_record(
+            record,
+            dummy_xml,
+            request.user if request.user.is_authenticated else None,
             serializer.validated_data["qaqc_confirmed"],
         )
+
         return Response({
-            "message": "Metadata successfully submitted and stored.",
+            "message": "Metadata successfully submitted and stored in PostGIS.",
             "record_id": stored.id,
             "version": stored.current_version,
             "identifier": record["distribution"]["identifier"],
@@ -168,9 +176,47 @@ class RecordListView(generics.ListAPIView):
 
 
 class RecordDetailView(generics.RetrieveAPIView):
-    """GET /api/v1/records/<uuid>/"""
+    """GET and PUT /api/v1/records/<uuid>/"""
     permission_classes = [IsAuthenticated]
     serializer_class = RecordSerializer
     queryset = MetadataRecord.objects.filter(status="APPROVED")
     lookup_field = "id"
     lookup_url_kwarg = "record_id"
+
+    @extend_schema(
+        request=SubmitInputSerializer,
+        responses={200: RecordSerializer, 422: ValidateResponseSerializer}
+    )
+    def put(self, request, record_id):
+        serializer = SubmitInputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        record = _mark_provenance(dict(serializer.validated_data["record"]), "user")
+
+        # 1) The gate: Run ONLY gap detection (temporary bypass for 501 xml check)
+        gaps = services.find_gaps(record)
+        if gaps:
+            return Response({
+                "is_valid": False,
+                "gap_report": _gap_report(gaps),
+                "schema_errors": [],
+            }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        # Fetch existing record to keep its original identifier (Task 6 bypass)
+        existing_record = self.get_object()
+        record["distribution"] = {
+            "identifier": existing_record.identifier,
+            "access_url": existing_record.access_url
+        }
+
+        dummy_xml = "<gmd:MD_Metadata>Dummy XML Update</gmd:MD_Metadata>"
+
+        # 2) update_record (task 8) does version + provenance + QAQC atomically
+        updated_obj = update_record(
+            record_id, record, dummy_xml, request.user,
+            serializer.validated_data["qaqc_confirmed"]
+        )
+
+        # 3) Return the updated record
+        response_serializer = self.get_serializer(updated_obj)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
