@@ -1,0 +1,56 @@
+
+mcf:
+  version: 2.0
+
+metadata:
+  identifier: ""
+  language: ""
+  charset: ""
+  hierarchylevel: ""
+  dates:
+    creation: ""
+
+spatial:
+  datatype: ""
+  geomtype: ""
+
+identification:
+  title: ""
+  abstract: ""
+  language: ""
+  rights: ""
+  url: ""
+  status: ""
+  dates:
+    creation: ""
+  keywords:
+    default:
+      keywords:
+        - ""
+  extents:
+    spatial:
+      - crs: ""
+        bbox: []
+
+contact:
+  author:
+    organization: ""
+    individualname: ""
+    email: ""
+    role: ""
+
+  pointOfContact:
+    organization: ""
+    individualname: ""
+    email: ""
+    role: ""
+
+distribution:
+  www:
+    format: ""
+    format_version: ""
+    url: ""
+    type: ""
+    name: ""
+    description: ""
+    function: ""
