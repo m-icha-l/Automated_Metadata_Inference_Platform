@@ -76,20 +76,24 @@ def check_record(record: dict) -> CheckResult:
 
 # ---- STUBS (owned by other tasks) ----------------------------------------
 def infer(path: str, ext: str) -> dict:
-    """TASK 1. Return a draft record dict; raise UnreadableFile for corrupt input."""
+    """TASK 1.
+    TODO: connect the inference engine, update SUPPORTED_EXTENSIONS."""
     raise NotYetImplemented()
 
 
 def to_xml(record: dict) -> str:
-    """TASK 5. Serialise to ISO 19139 XML via pygeometa."""
+    """TASK 5.
+    TODO: connect pygeometa via api; pin the pygeometa version."""
     raise NotYetImplemented()
 
 
 def validate_xml(xml: str) -> list:
-    """TASK 5. Return a list of error strings (empty = valid)."""
+    """TASK 5.
+    TODO: validate against the ISO 19139 XSD."""
     raise NotYetImplemented()
 
 
 def assign_identifier(record: dict) -> dict:
-    """TASK 6. Return {"identifier": ..., "access_url": ...}."""
+    """TASK 6.
+    TODO: choose the mechanism, not assigned to anyone?"""
     raise NotYetImplemented()
