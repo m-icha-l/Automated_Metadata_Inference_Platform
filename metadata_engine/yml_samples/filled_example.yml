@@ -1,0 +1,54 @@
+mcf:
+  version: 2.0
+metadata:
+  identifier: test-metadata
+  language: eng
+  charset: utf8
+  hierarchylevel: dataset
+  dates:
+    creation: '2026-11-06'
+spatial:
+  datatype: vector
+  geomtype: point
+identification:
+  title: Example Dataset
+  abstract: Example dataset for testing pygeometa XML generation.
+  language: eng
+  rights: Example
+  url: https://example.org/dataset
+  status: completed
+  dates:
+    creation: '2026-11-06'
+  keywords:
+    default:
+      keywords:
+      - test
+      - example dataset
+  extents:
+    spatial:
+    - crs: 4326
+      bbox:
+      - 24.0
+      - 59.0
+      - 26.0
+      - 61.0
+contact:
+  author:
+    organization: Example Organisation
+    individualname: Metadata Contact
+    email: metadata@example.org
+    role: author
+  pointOfContact:
+    organization: Example Organisation
+    individualname: Metadata Contact
+    email: metadata@example.org
+    role: pointOfContact
+distribution:
+  www:
+    format: GeoJSON
+    format_version: '1.0'
+    url: https://example.org/dataset.geojson
+    type: WWW:DOWNLOAD
+    name: Example dataset download
+    description: Download the example dataset.
+    function: download

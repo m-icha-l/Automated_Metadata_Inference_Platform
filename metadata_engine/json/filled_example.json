@@ -1,0 +1,138 @@
+{
+    "identifier": {
+        "value": "test-metadata",
+        "status": "inferred"
+    },
+    "language": {
+        "value": "eng",
+        "status": "inferred"
+    },
+    "charset": {
+        "value": "utf8",
+        "status": "inferred"
+    },
+    "hierarchylevel": {
+        "value": "dataset",
+        "status": "inferred"
+    },
+    "metadata_creation": {
+        "value": "2026-11-06",
+        "status": "inferred"
+    },
+    "datatype": {
+        "value": "vector",
+        "status": "inferred"
+    },
+    "geomtype": {
+        "value": "point",
+        "status": "inferred"
+    },
+    "title": {
+        "value": "Example Dataset",
+        "status": "inferred"
+    },
+    "abstract": {
+        "value": "Example dataset for testing pygeometa XML generation.",
+        "status": "inferred"
+    },
+    "identification_language": {
+        "value": "eng",
+        "status": "inferred"
+    },
+    "rights": {
+        "value": "Example",
+        "status": "inferred"
+    },
+    "url": {
+        "value": "https://example.org/dataset",
+        "status": "inferred"
+    },
+    "status": {
+        "value": "completed",
+        "status": "inferred"
+    },
+    "identification_creation": {
+        "value": "2026-11-06",
+        "status": "inferred"
+    },
+    "keywords": {
+        "value": [
+            "test",
+            "example dataset"
+        ],
+        "status": "inferred"
+    },
+    "crs": {
+        "value": 4326,
+        "status": "inferred"
+    },
+    "bbox": {
+        "value": [
+            24.0,
+            59.0,
+            26.0,
+            61.0
+        ],
+        "status": "inferred"
+    },
+    "author_organization": {
+        "value": "Example Organisation",
+        "status": "inferred"
+    },
+    "author_individualname": {
+        "value": "Metadata Contact",
+        "status": "inferred"
+    },
+    "author_email": {
+        "value": "metadata@example.org",
+        "status": "inferred"
+    },
+    "author_role": {
+        "value": "author",
+        "status": "inferred"
+    },
+    "contact_organization": {
+        "value": "Example Organisation",
+        "status": "inferred"
+    },
+    "contact_individualname": {
+        "value": "Metadata Contact",
+        "status": "inferred"
+    },
+    "contact_email": {
+        "value": "metadata@example.org",
+        "status": "inferred"
+    },
+    "contact_role": {
+        "value": "pointOfContact",
+        "status": "inferred"
+    },
+    "format": {
+        "value": "GeoJSON",
+        "status": "inferred"
+    },
+    "format_version": {
+        "value": "1.0",
+        "status": "inferred"
+    },
+    "distribution_url": {
+        "value": "https://example.org/dataset.geojson",
+        "status": "inferred"
+    },
+    "distribution_type": {
+        "value": "WWW:DOWNLOAD",
+        "status": "inferred"
+    },
+    "distribution_name": {
+        "value": "Example dataset download",
+        "status": "inferred"
+    },
+    "distribution_description": {
+        "value": "Download the example dataset.",
+        "status": "inferred"
+    },
+    "distribution_function": {
+        "value": "download",
+        "status": "inferred"
+    }
+}

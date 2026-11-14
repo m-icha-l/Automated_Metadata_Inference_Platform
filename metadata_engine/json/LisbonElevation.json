@@ -1,0 +1,142 @@
+{
+    "identifier": {
+        "value": "",
+        "status": "missing"
+    },
+    "language": {
+        "value": "",
+        "status": "missing"
+    },
+    "charset": {
+        "value": "",
+        "status": "missing"
+    },
+    "hierarchylevel": {
+        "value": "",
+        "status": "missing"
+    },
+    "metadata_creation": {
+        "value": "2026-11-14",
+        "status": "inferred"
+    },
+    "datatype": {
+        "value": "",
+        "status": "missing"
+    },
+    "geomtype": {
+        "value": "",
+        "status": "missing"
+    },
+    "title": {
+        "value": "",
+        "status": "missing"
+    },
+    "abstract": {
+        "value": "",
+        "status": "missing"
+    },
+    "identification_language": {
+        "value": "",
+        "status": "missing"
+    },
+    "rights": {
+        "value": "",
+        "status": "missing"
+    },
+    "url": {
+        "value": "",
+        "status": "missing"
+    },
+    "status": {
+        "value": "",
+        "status": "missing"
+    },
+    "identification_creation": {
+        "value": "",
+        "status": "missing"
+    },
+    "keywords": {
+        "value": [],
+        "status": "missing"
+    },
+    "crs": {
+        "value": "",
+        "status": "missing"
+    },
+    "bbox": {
+        "value": [],
+        "status": "missing"
+    },
+    "author_organization": {
+        "value": "",
+        "status": "missing"
+    },
+    "author_individualname": {
+        "value": "",
+        "status": "missing"
+    },
+    "author_email": {
+        "value": "",
+        "status": "missing"
+    },
+    "author_role": {
+        "value": "",
+        "status": "missing"
+    },
+    "contact_organization": {
+        "value": "",
+        "status": "missing"
+    },
+    "contact_individualname": {
+        "value": "",
+        "status": "missing"
+    },
+    "contact_email": {
+        "value": "",
+        "status": "missing"
+    },
+    "contact_role": {
+        "value": "",
+        "status": "missing"
+    },
+    "format": {
+        "value": "",
+        "status": "missing"
+    },
+    "format_version": {
+        "value": "",
+        "status": "missing"
+    },
+    "distribution_url": {
+        "value": "",
+        "status": "missing"
+    },
+    "distribution_type": {
+        "value": "",
+        "status": "missing"
+    },
+    "distribution_name": {
+        "value": "",
+        "status": "missing"
+    },
+    "distribution_description": {
+        "value": "",
+        "status": "missing"
+    },
+    "distribution_function": {
+        "value": "",
+        "status": "missing"
+    },
+    "band_statistics": {
+        "value": [
+            {
+                "band": 1,
+                "min": -6.82943868637085,
+                "max": 217.9407501220703,
+                "mean": 38.76347732543945,
+                "nodata": null
+            }
+        ],
+        "status": "inferred"
+    }
+}
