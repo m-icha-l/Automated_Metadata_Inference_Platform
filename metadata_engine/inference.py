@@ -1,13 +1,16 @@
-from pathlib import Path
 import json
-
+from pathlib import Path
 from metadata_extraction import extract_metadata
+
+SUPPORTED_FILE_EXTENSIONS = [".shp", ".geoson", ".json", ".kml", ".txt", ".xls", ".xlsx",
+                              ".tif", ".tiff", ".asc"
+                              ".hdf", ".hdf5", ".nc"]
 
 def infer_metadata(file_path):
 
     extension = Path(file_path).suffix.lower()
 
-    if extension in [".tif", ".tiff"]:
+    if extension in SUPPORTED_FILE_EXTENSIONS:
         metadata = extract_metadata(file_path)
     else:
         raise ValueError("Unsupported file format")
@@ -15,18 +18,17 @@ def infer_metadata(file_path):
     return metadata
 
 
-def main():
-
-    # file_path = "../samples/LisbonElevation.tif"
-    file_path = "../samples/GeogToWGS84GeoKey5.tif"
+if __name__ == "__main__":
+    file_path = "../samples/LisbonElevation.tif"
+    # file_path = "../samples/GeogToWGS84GeoKey5.tif"
     # file_path = "abc"
 
     metadata = infer_metadata(file_path)
-    output_path = Path("../metadata_engine/json/") / Path(file_path).with_suffix(".json").name
 
-    with open(output_path, "w", encoding="utf-8") as file:
-        json.dump(metadata, file, indent=4, ensure_ascii=False)
+    output_dir = Path(__file__).resolve().parent / "generated_json"
+    output_file = output_dir / (Path(file_path).stem + ".json")
 
-
-if __name__ == "__main__":
-    main()
+    output_file.write_text(
+        json.dumps(metadata, indent=4, ensure_ascii=False),
+        encoding="utf-8"
+    )
