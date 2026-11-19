@@ -6,6 +6,13 @@ the record, validates it against the ISO 19139 schema, and submits it. Submitted
 stored with version history, provenance tags (which values were inferred, which typed by the
 user) and a QAQC confirmation.
 
+Current version needs to have GDAL commented out in the requirements.txt!
+
+cp .env.example .env   (set DB_PASSWORD)
+docker compose up --build
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py createsuperuser
+
 - **Swagger UI** (try the API in the browser): http://127.0.0.1:8000/api/v1/docs/
 - **Django admin** (see what is stored): http://127.0.0.1:8000/admin/
 - **OpenAPI schema** (for other systems): http://127.0.0.1:8000/api/v1/schema/
