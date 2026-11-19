@@ -1,9 +1,14 @@
 import json
 from pathlib import Path
-from metadata_extraction import extract_metadata
 
-SUPPORTED_FILE_EXTENSIONS = [".shp", ".geoson", ".json", ".kml", ".txt", ".xls", ".xlsx",
-                              ".tif", ".tiff", ".asc"
+#fixes ModuleNotFoundError
+try:
+    from .metadata_extraction import extract_metadata   # inside Django
+except ImportError:
+    from metadata_extraction import extract_metadata    # running the script directly
+
+SUPPORTED_FILE_EXTENSIONS = [".shp", ".geojson", ".json", ".kml", ".txt", ".xls", ".xlsx",
+                              ".tif", ".tiff", ".asc",
                               ".hdf", ".hdf5", ".nc"]
 
 def infer_metadata(file_path):

@@ -160,3 +160,4 @@ class RecordSerializer(serializers.Serializer):
 
 class ErrorSerializer(serializers.Serializer):
     error = serializers.CharField()
+    

@@ -2,27 +2,23 @@ import json
 from pathlib import Path
 from pygeometa.core import read_mcf
 from pygeometa.schemas.iso19139 import ISO19139OutputSchema
-from iso_mapping import map_iso_metadata
+
+try:
+    from .iso_mapping import map_iso_metadata   # inside Django
+except ImportError:
+    from iso_mapping import map_iso_metadata
+
+
+def generate_iso19139_from_dict(extracted: dict) -> str:
+    yml = map_iso_metadata(extracted)
+    mcf_dict = read_mcf(yml)
+    return ISO19139OutputSchema().write(mcf_dict)
 
 
 def generate_iso19139(json_file):
-
     with open(json_file, "r", encoding="utf-8") as f:
         extracted = json.load(f)
-
-    yml = map_iso_metadata(extracted)
-
-    # read from string
-    mcf_dict = read_mcf(yml)
-
-    # choose ISO 19139 output schema
-    iso_os = ISO19139OutputSchema()
-
-    # default schema
-    xml_string = iso_os.write(mcf_dict)
-
-    return xml_string
-
+    return generate_iso19139_from_dict(extracted)
 
 if __name__ == "__main__":
     input_file = Path("generated_json/filled_example.json")
