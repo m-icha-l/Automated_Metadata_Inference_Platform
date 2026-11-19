@@ -3,7 +3,7 @@ Service layer. Views call ONLY these functions, so the web form and the REST
 API go through exactly the same inference, gap detection and validation.
 
 Real here:  find_gaps, check_record (the gate that cannot be bypassed)
-Connected:  infer, to_xml, validate_xml  -> engine_adapters.py (teammate's engine in engine2/)
+Connected:  infer, to_xml, validate_xml  -> engine_adapters.py (teammate's engine in metadata_engine/)
             assign_identifier            -> identifiers.py (task 6)
             store_record                 -> storage.py (task 8)
 

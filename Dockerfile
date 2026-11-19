@@ -21,5 +21,11 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
+# The GDAL Python package must match the system libgdal version exactly,
+# so it is installed here instead of being pinned in requirements.txt.
+# --no-build-isolation lets it build against the installed numpy (needed for ReadAsArray).
+RUN pip install setuptools wheel \
+    && pip install --no-build-isolation GDAL=="$(gdal-config --version)"
+
 # Copy the rest of the application
 COPY . .

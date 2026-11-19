@@ -1,5 +1,5 @@
 """
-Adapters between the Django skeleton (services.py) and the engine (api/engine2/).
+Adapters between the Django skeleton (services.py) and the engine (api/metadata_engine/).
 
 services.py imports infer, to_xml and validate_xml from here. Engine imports are done
 inside the functions, so a missing engine library breaks only that step and not the whole API.
@@ -90,7 +90,7 @@ def engine_to_record(raw: dict) -> dict:
 def infer(path: str, ext: str) -> dict:
     """TASK 1: run the engine's inference and convert the result to our record format."""
     from .services import UnreadableFile            # imported late to avoid a circular import
-    from .engine2.inference import infer_metadata
+    from .metadata_engine.inference import infer_metadata
 
     try:
         raw = infer_metadata(path)
@@ -124,25 +124,25 @@ def _record_to_engine(record: dict) -> dict:
 
 
 def to_xml(record: dict) -> str:
-    """TASK 5: our record -> ISO 19139 XML string via pygeometa."""
+    """TASK 5: our record -> ISO 19139 XML string via the engine's xml_generation."""
+    if USE_ENGINE_MAPPER:
+        from .metadata_engine.xml_generation import generate_iso19139_from_dict
+        return generate_iso19139_from_dict(_record_to_engine(record))
+
+    # Alternative path (off by default): our own record -> MCF mapping in mcf.py.
     import yaml
     from pygeometa.core import read_mcf
     from pygeometa.schemas.iso19139 import ISO19139OutputSchema
+    from .mcf import record_to_mcf
 
-    if USE_ENGINE_MAPPER:
-        from .engine2.iso_mapping import map_iso_metadata
-        yml = map_iso_metadata(_record_to_engine(record))
-    else:
-        from .mcf import record_to_mcf
-        yml = yaml.safe_dump(record_to_mcf(record), sort_keys=False)
-
+    yml = yaml.safe_dump(record_to_mcf(record), sort_keys=False)
     return ISO19139OutputSchema().write(read_mcf(yml))
 
 
 def validate_xml(xml: str) -> list:
     """TASK 5: validate with the engine's XSD check. Returns a list of error strings.
     The engine returns (is_valid, [(message, line), ...])."""
-    from .engine2.xml_validation import validate_iso19139
+    from .metadata_engine.xml_validation import validate_iso19139
 
     with tempfile.TemporaryDirectory() as tmp:
         path = Path(tmp) / "record.xml"

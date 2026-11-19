@@ -6,7 +6,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from api import services
-from api.models import MetadataRecord, QAQCAudit, QAQCConfirmation, RecordVersion
+from api.models import MetadataRecord, ProvenanceTag, QAQCConfirmation, RecordVersion
 
 User = get_user_model()
 
@@ -29,7 +29,8 @@ VALID_RECORD = {
 
 
 class ApiTestBase(TestCase):
-    """Replaces the other tasks' functions with fakes."""
+    """Replaces the engine, the identifier and the XML steps with fakes,
+    so these tests cover the API gate and the storage only."""
 
     def setUp(self):
         self.user = User.objects.create_user("tester", password="pw")
@@ -57,8 +58,8 @@ class ApiTestBase(TestCase):
     def assertNothingStored(self):
         self.assertEqual(MetadataRecord.objects.count(), 0)
         self.assertEqual(RecordVersion.objects.count(), 0)
+        self.assertEqual(ProvenanceTag.objects.count(), 0)
         self.assertEqual(QAQCConfirmation.objects.count(), 0)
-        self.assertEqual(QAQCAudit.objects.count(), 0)
 
 
 class GapDetectionTests(TestCase):
@@ -137,7 +138,7 @@ class SubmitGateTests(ApiTestBase):
 
 
 class SubmitStorageTests(ApiTestBase):
-    def test_valid_record_is_stored_with_version_provenance_and_audit(self):
+    def test_valid_record_is_stored_with_version_provenance_and_confirmation(self):
         response = self.submit(VALID_RECORD, qaqc_confirmed=True)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["identifier"], "diwa:test-1")
@@ -149,19 +150,21 @@ class SubmitStorageTests(ApiTestBase):
 
         version = RecordVersion.objects.get()
         self.assertEqual(version.version_number, 1)
-        self.assertEqual(version.provenance["title"], "user")
+        self.assertEqual(
+            ProvenanceTag.objects.get(version=version, field_name="title").source,
+            "user",
+        )
 
         confirmation = QAQCConfirmation.objects.get()
         self.assertEqual(confirmation.confirmed_by, self.user)
         self.assertIsNotNone(confirmation.confirmed_at)
-        self.assertEqual(QAQCAudit.objects.count(), 1)
 
     def test_no_confirmation_row_when_not_confirmed(self):
         self.submit(VALID_RECORD)
         self.assertEqual(QAQCConfirmation.objects.count(), 0)
 
     def test_failed_write_leaves_no_partial_rows(self):
-        with patch("api.storage.QAQCAudit.objects.create",
+        with patch("api.storage.QAQCConfirmation.objects.create",
                    side_effect=RuntimeError("boom")):
             with self.assertRaises(RuntimeError):
                 self.submit(VALID_RECORD, qaqc_confirmed=True)
@@ -179,3 +182,4 @@ class RetrievalTests(ApiTestBase):
         detail = self.client.get(f"/api/v1/records/{record_id}/")
         self.assertEqual(detail.status_code, 200)
         self.assertEqual(detail.data["record"]["title"], "Test lake survey")
+        
